@@ -18,7 +18,7 @@ class Block {
 	constructor(data){
 		this.hash = null;                                           // Hash of the block
 		this.height = 0;                                            // Block Height (consecutive number of each block)
-		this.body = Buffer(JSON.stringify(data)).toString('hex');   // Will contain the transactions stored in the block, by default it will encode the data
+		this.body = Buffer.from(JSON.stringify(data)).toString('hex');   // Will contain the transactions stored in the block, by default it will encode the data
 		this.time = 0;                                              // Timestamp for the Block creation
 		this.previousBlockHash = null;                              // Reference to the previous Block Hash
     }
@@ -45,7 +45,16 @@ class Block {
             // Returning the Block is not valid
             
             // Returning the Block is valid
-
+            //Mahesh Added Code
+            let currentHash = self.hash;
+            self.hash = null;
+            let validateHash= SHA256(JSON.stringify(self)).toString();
+            if(currentHash === validateHash){
+                self.hash = currentHash;
+                resolve(true)
+            }else{
+                resolve(false);
+            }
         });
     }
 
@@ -64,7 +73,16 @@ class Block {
         // Parse the data to an object to be retrieve.
 
         // Resolve with the data if the object isn't the Genesis block
-
+        //Mahesh Added Code
+        let encodedData = this.body;
+        let decodedData = hex2ascii(encodedData)
+        let jsonData = JSON.parse(decodedData);        
+        
+        if(jsonData && this.height > 0){
+            console.log("block data"+jsonData);
+            return jsonData;
+        }
+        return false;
     }
 
 }
